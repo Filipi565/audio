@@ -16,7 +16,7 @@ class DeviceInfo
     static PyObject *id(DeviceInfo *self, PyObject *args)
     {
         PyObject *result = PyType_GenericNew(&DeviceId_Type, nullptr, nullptr);
-        ma_device_id *id = reinterpret_cast<ma_device_id *>(((char *)result) + sizeof(PyObject));
+        ma_device_id *id = reinterpret_cast<ma_device_id *>(result + 1);
         (*id) = self->info.id;
 
         return result;
