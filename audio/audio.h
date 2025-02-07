@@ -9,7 +9,7 @@
 extern "C" {
 #endif
 
-PyTypeObject DeviceId_Type;
+extern PyTypeObject DeviceId_Type;
 
 #ifdef __cplusplus
 }
