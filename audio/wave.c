@@ -89,4 +89,6 @@ PyObject *WaveFromBytes(PyObject *m, PyObject *args)
     {
         PyErr_SetString(PyExc_IOError, "Invalid file type");
     }
+
+    return (PyObject *)result;
 }
