@@ -16,8 +16,8 @@ PyMODINIT_FUNC PyInit__audio()
         return NULL;
     }
 
-    PyTypeObject *obj[] = {&AudioDevice_Type};
-    const char *names[] = {"_AudioDeviceHelper"};
+    PyTypeObject *obj[] = {&AudioDevice_Type, &DeviceId_Type};
+    const char *names[] = {"_AudioDeviceHelper", "DeviceId"};
     size_t s = sizeof(obj)/sizeof(void *);
 
     for (int i = 0; i < s; i++)
