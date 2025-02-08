@@ -23,5 +23,11 @@ class _AudioDeviceHelper(_audio._AudioDeviceHelper):
 
 AudioDevice = _AudioDeviceHelper()
 
+__all__ = [
+    "MiniAudioError",
+    "AudioDevice",
+    "DeviceId"
+]
+
 del _AudioDeviceHelper
 del _audio
