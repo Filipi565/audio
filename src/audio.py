@@ -3,7 +3,6 @@ from _audio import MiniAudioError # type: ignore
 from _audio import DeviceId # type: ignore
 
 MiniAudioError.__module__ = __name__
-DeviceId.__module__ = __name__
 
 class _AudioDeviceHelper(_audio._AudioDeviceHelper):
     def init(self, audiodevice = None):
