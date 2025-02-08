@@ -68,51 +68,6 @@ static void MixAudioFrames(float *framesOut, const float *framesIn, ma_uint32 fr
     }
 }
 
-static ma_uint32 ReadAudioBufferFramesInMixingFormat(rAudioBuffer *audioBuffer, float *framesOut, ma_uint32 frameCount)
-{
-    // What's going on here is that we're continuously converting data from the AudioBuffer's internal format to the mixing format, which
-    // should be defined by the output format of the data converter. We do this until frameCount frames have been output. The important
-    // detail to remember here is that we never, ever attempt to read more input data than is required for the specified number of output
-    // frames. This can be achieved with ma_data_converter_get_required_input_frame_count()
-    ma_uint8 inputBuffer[4096] = { 0 };
-    ma_uint32 inputBufferFrameCap = sizeof(inputBuffer)/ma_get_bytes_per_frame(audioBuffer->converter.formatIn, audioBuffer->converter.channelsIn);
-
-    ma_uint32 totalOutputFramesProcessed = 0;
-    while (totalOutputFramesProcessed < frameCount)
-    {
-        ma_uint64 outputFramesToProcessThisIteration = frameCount - totalOutputFramesProcessed;
-        ma_uint64 inputFramesToProcessThisIteration = 0;
-
-        (void)ma_data_converter_get_required_input_frame_count(&audioBuffer->converter, outputFramesToProcessThisIteration, &inputFramesToProcessThisIteration);
-        if (inputFramesToProcessThisIteration > inputBufferFrameCap)
-        {
-            inputFramesToProcessThisIteration = inputBufferFrameCap;
-        }
-
-        float *runningFramesOut = framesOut + (totalOutputFramesProcessed*audioBuffer->converter.channelsOut);
-
-        /* At this point we can convert the data to our mixing format. */
-        ma_uint64 inputFramesProcessedThisIteration = ReadAudioBufferFramesInInternalFormat(audioBuffer, inputBuffer, (ma_uint32)inputFramesToProcessThisIteration);    /* Safe cast. */
-        ma_uint64 outputFramesProcessedThisIteration = outputFramesToProcessThisIteration;
-        ma_data_converter_process_pcm_frames(&audioBuffer->converter, inputBuffer, &inputFramesProcessedThisIteration, runningFramesOut, &outputFramesProcessedThisIteration);
-
-        totalOutputFramesProcessed += (ma_uint32)outputFramesProcessedThisIteration; /* Safe cast. */
-
-        if (inputFramesProcessedThisIteration < inputFramesToProcessThisIteration)
-        {
-            break;  /* Ran out of input data. */
-        }
-
-        /* This should never be hit, but will add it here for safety. Ensures we get out of the loop when no input nor output frames are processed. */
-        if (inputFramesProcessedThisIteration == 0 && outputFramesProcessedThisIteration == 0)
-        {
-            break;
-        }
-    }
-
-    return totalOutputFramesProcessed;
-}
-
 typedef enum AudioBufferUsage {
     AUDIO_BUFFER_USAGE_STATIC = 0,
     AUDIO_BUFFER_USAGE_STREAM
@@ -212,7 +167,6 @@ static ma_uint32 ReadAudioBufferFramesInInternalFormat(rAudioBuffer *audioBuffer
     return framesRead;
 }
 
-// Reads audio data from an AudioBuffer object in device format, returned data will be in a format appropriate for mixing
 static ma_uint32 ReadAudioBufferFramesInMixingFormat(rAudioBuffer *audioBuffer, float *framesOut, ma_uint32 frameCount)
 {
     // What's going on here is that we're continuously converting data from the AudioBuffer's internal format to the mixing format, which

@@ -164,7 +164,7 @@ static PyObject *AudioDevice_close(AudioData *self, PyObject *args)
         ma_context_uninit(&AUDIO.System.context);
 
         AUDIO.System.isReady = false;
-        MA_FREE(AUDIO.System.pcmBuffer);
+        free(AUDIO.System.pcmBuffer);
         AUDIO.System.pcmBuffer = NULL;
         AUDIO.System.pcmBufferSize = 0;
     }
