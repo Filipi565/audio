@@ -7,6 +7,9 @@ from _audio import ( # type: ignore
 
 MiniAudioError.__module__ = __name__
 
+def get_devices():
+    return _audio._get_devices()
+
 class _AudioDeviceHelper(_audio._AudioDeviceHelper):
     def init(self, audiodevice = None):
         super().init(audiodevice)
@@ -28,10 +31,10 @@ AudioDevice = _AudioDeviceHelper()
 
 __all__ = [
     "MiniAudioError",
+    "get_devices",
     "AudioDevice",
     "DeviceInfo",
-    "DeviceId"
+    "DeviceId",
 ]
 
 del _AudioDeviceHelper
-del _audio

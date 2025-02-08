@@ -1,9 +1,16 @@
 #include "audio.h"
 
+PyObject *GetDevices(PyObject *, PyObject *);
+
+static PyMethodDef methods[] = {
+    {"_get_devices", GetDevices, METH_NOARGS, NULL},
+    {NULL, NULL, 0, NULL}
+};
+
 static PyModuleDef module = {
     PyModuleDef_HEAD_INIT,
     .m_name = "_audio",
-    .m_methods = NULL
+    .m_methods = methods
 };
 
 PyObject *MiniAudioError;

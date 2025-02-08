@@ -213,6 +213,41 @@ static PyObject *AudioDevice_master_volume(PyObject *self, PyObject *args)
     Py_RETURN_NONE;
 }
 
+PyObject *GetDevices(PyObject *m, PyObject *args)
+{
+    ma_result Device_result;
+    ma_device_info *pPlaybackInfos;
+    ma_uint32 playbackCount;
+    ma_device_info *pUnused;
+    ma_uint32 Unused;
+
+    Device_result = ma_context_get_devices(&AUDIO.System.context, &pPlaybackInfos, &playbackCount, &pUnused, &Unused);
+
+    if (Device_result != MA_SUCCESS)
+    {
+        PyErr_SetString(MiniAudioError, "Error on getting devices");
+        return NULL;
+    }
+
+    PyObject *result = PyList_New(playbackCount);
+
+    if (result == NULL)
+    {
+        return NULL;
+    }
+
+    for (ma_uint32 iDevice = 0; iDevice < playbackCount; iDevice++)
+    {
+        PyObject *deviceinfo_obj = PyType_GenericNew(&DeviceInfo_Type, NULL, NULL);
+        ma_device_info *deviceinfo = (ma_device_info *)(deviceinfo_obj + 1);
+        (*deviceinfo) = pPlaybackInfos[iDevice];
+
+        PyList_Append(result, deviceinfo_obj);
+    }
+
+    return result;
+}
+
 #define GETMETHOD(name) AudioDevice_##name
 
 static PyMethodDef methods[] = {
