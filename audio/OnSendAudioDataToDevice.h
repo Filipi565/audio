@@ -1,6 +1,7 @@
 #ifndef OnSendAudioDataToDevice_h
 #define OnSendAudioDataToDevice_h
 
+
 static bool IsAudioBufferPlayingInLockedState(rAudioBuffer *buffer)
 {
     bool result = false;
@@ -67,6 +68,151 @@ static void MixAudioFrames(float *framesOut, const float *framesIn, ma_uint32 fr
     }
 }
 
+static ma_uint32 ReadAudioBufferFramesInMixingFormat(rAudioBuffer *audioBuffer, float *framesOut, ma_uint32 frameCount)
+{
+    // What's going on here is that we're continuously converting data from the AudioBuffer's internal format to the mixing format, which
+    // should be defined by the output format of the data converter. We do this until frameCount frames have been output. The important
+    // detail to remember here is that we never, ever attempt to read more input data than is required for the specified number of output
+    // frames. This can be achieved with ma_data_converter_get_required_input_frame_count()
+    ma_uint8 inputBuffer[4096] = { 0 };
+    ma_uint32 inputBufferFrameCap = sizeof(inputBuffer)/ma_get_bytes_per_frame(audioBuffer->converter.formatIn, audioBuffer->converter.channelsIn);
+
+    ma_uint32 totalOutputFramesProcessed = 0;
+    while (totalOutputFramesProcessed < frameCount)
+    {
+        ma_uint64 outputFramesToProcessThisIteration = frameCount - totalOutputFramesProcessed;
+        ma_uint64 inputFramesToProcessThisIteration = 0;
+
+        (void)ma_data_converter_get_required_input_frame_count(&audioBuffer->converter, outputFramesToProcessThisIteration, &inputFramesToProcessThisIteration);
+        if (inputFramesToProcessThisIteration > inputBufferFrameCap)
+        {
+            inputFramesToProcessThisIteration = inputBufferFrameCap;
+        }
+
+        float *runningFramesOut = framesOut + (totalOutputFramesProcessed*audioBuffer->converter.channelsOut);
+
+        /* At this point we can convert the data to our mixing format. */
+        ma_uint64 inputFramesProcessedThisIteration = ReadAudioBufferFramesInInternalFormat(audioBuffer, inputBuffer, (ma_uint32)inputFramesToProcessThisIteration);    /* Safe cast. */
+        ma_uint64 outputFramesProcessedThisIteration = outputFramesToProcessThisIteration;
+        ma_data_converter_process_pcm_frames(&audioBuffer->converter, inputBuffer, &inputFramesProcessedThisIteration, runningFramesOut, &outputFramesProcessedThisIteration);
+
+        totalOutputFramesProcessed += (ma_uint32)outputFramesProcessedThisIteration; /* Safe cast. */
+
+        if (inputFramesProcessedThisIteration < inputFramesToProcessThisIteration)
+        {
+            break;  /* Ran out of input data. */
+        }
+
+        /* This should never be hit, but will add it here for safety. Ensures we get out of the loop when no input nor output frames are processed. */
+        if (inputFramesProcessedThisIteration == 0 && outputFramesProcessedThisIteration == 0)
+        {
+            break;
+        }
+    }
+
+    return totalOutputFramesProcessed;
+}
+
+typedef enum AudioBufferUsage {
+    AUDIO_BUFFER_USAGE_STATIC = 0,
+    AUDIO_BUFFER_USAGE_STREAM
+} AudioBufferUsage;
+
+static ma_uint32 ReadAudioBufferFramesInInternalFormat(rAudioBuffer *audioBuffer, void *framesOut, ma_uint32 frameCount)
+{
+    // Using audio buffer callback
+    if (audioBuffer->callback)
+    {
+        audioBuffer->callback(framesOut, frameCount);
+        audioBuffer->framesProcessed += frameCount;
+
+        return frameCount;
+    }
+
+    ma_uint32 subBufferSizeInFrames = (audioBuffer->sizeInFrames > 1)? audioBuffer->sizeInFrames/2 : audioBuffer->sizeInFrames;
+    ma_uint32 currentSubBufferIndex = audioBuffer->frameCursorPos/subBufferSizeInFrames;
+
+    if (currentSubBufferIndex > 1) return 0;
+
+    // Another thread can update the processed state of buffers, so
+    // we just take a copy here to try and avoid potential synchronization problems
+    bool isSubBufferProcessed[2] = { 0 };
+    isSubBufferProcessed[0] = audioBuffer->isSubBufferProcessed[0];
+    isSubBufferProcessed[1] = audioBuffer->isSubBufferProcessed[1];
+
+    ma_uint32 frameSizeInBytes = ma_get_bytes_per_frame(audioBuffer->converter.formatIn, audioBuffer->converter.channelsIn);
+
+    // Fill out every frame until we find a buffer that's marked as processed. Then fill the remainder with 0
+    ma_uint32 framesRead = 0;
+    while (1)
+    {
+        // We break from this loop differently depending on the buffer's usage
+        //  - For static buffers, we simply fill as much data as we can
+        //  - For streaming buffers we only fill half of the buffer that are processed
+        //    Unprocessed halves must keep their audio data in-tact
+        if (audioBuffer->usage == AUDIO_BUFFER_USAGE_STATIC)
+        {
+            if (framesRead >= frameCount) break;
+        }
+        else
+        {
+            if (isSubBufferProcessed[currentSubBufferIndex]) break;
+        }
+
+        ma_uint32 totalFramesRemaining = (frameCount - framesRead);
+        if (totalFramesRemaining == 0) break;
+
+        ma_uint32 framesRemainingInOutputBuffer;
+        if (audioBuffer->usage == AUDIO_BUFFER_USAGE_STATIC)
+        {
+            framesRemainingInOutputBuffer = audioBuffer->sizeInFrames - audioBuffer->frameCursorPos;
+        }
+        else
+        {
+            ma_uint32 firstFrameIndexOfThisSubBuffer = subBufferSizeInFrames*currentSubBufferIndex;
+            framesRemainingInOutputBuffer = subBufferSizeInFrames - (audioBuffer->frameCursorPos - firstFrameIndexOfThisSubBuffer);
+        }
+
+        ma_uint32 framesToRead = totalFramesRemaining;
+        if (framesToRead > framesRemainingInOutputBuffer) framesToRead = framesRemainingInOutputBuffer;
+
+        memcpy((unsigned char *)framesOut + (framesRead*frameSizeInBytes), audioBuffer->data + (audioBuffer->frameCursorPos*frameSizeInBytes), framesToRead*frameSizeInBytes);
+        audioBuffer->frameCursorPos = (audioBuffer->frameCursorPos + framesToRead)%audioBuffer->sizeInFrames;
+        framesRead += framesToRead;
+
+        // If we've read to the end of the buffer, mark it as processed
+        if (framesToRead == framesRemainingInOutputBuffer)
+        {
+            audioBuffer->isSubBufferProcessed[currentSubBufferIndex] = true;
+            isSubBufferProcessed[currentSubBufferIndex] = true;
+
+            currentSubBufferIndex = (currentSubBufferIndex + 1)%2;
+
+            // We need to break from this loop if we're not looping
+            if (!audioBuffer->looping)
+            {
+                StopAudioBufferInLockedState(audioBuffer);
+                break;
+            }
+        }
+    }
+
+    // Zero-fill excess
+    ma_uint32 totalFramesRemaining = (frameCount - framesRead);
+    if (totalFramesRemaining > 0)
+    {
+        memset((unsigned char *)framesOut + (framesRead*frameSizeInBytes), 0, totalFramesRemaining*frameSizeInBytes);
+
+        // For static buffers we can fill the remaining frames with silence for safety, but we don't want
+        // to report those frames as "read". The reason for this is that the caller uses the return value
+        // to know whether a non-looping sound has finished playback
+        if (audioBuffer->usage != AUDIO_BUFFER_USAGE_STATIC) framesRead += totalFramesRemaining;
+    }
+
+    return framesRead;
+}
+
+// Reads audio data from an AudioBuffer object in device format, returned data will be in a format appropriate for mixing
 static ma_uint32 ReadAudioBufferFramesInMixingFormat(rAudioBuffer *audioBuffer, float *framesOut, ma_uint32 frameCount)
 {
     // What's going on here is that we're continuously converting data from the AudioBuffer's internal format to the mixing format, which
