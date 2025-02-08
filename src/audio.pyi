@@ -1,8 +1,11 @@
-from typing import Union, List
+from typing import Union, List, final
 
 class MiniAudioError(Exception): ...
+
+@final
 class DeviceId: ...
 
+@final
 class DeviceInfo:
     @property
     def name(self) -> str:
