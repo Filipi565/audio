@@ -66,7 +66,7 @@ PyObject *WaveFromBytes(PyObject *m, PyObject *args)
 
     PyTypeObject *cls = (PyTypeObject *)cls_obj;
 
-    WaveObj *result = (WaveObj *)cls->tp_new(cls, NULL, NULL);
+    WaveObj *result = (WaveObj *)PyType_GenericNew(cls, NULL, NULL);
     if (result == NULL)
     {
         return NULL;
@@ -85,10 +85,12 @@ PyObject *WaveFromBytes(PyObject *m, PyObject *args)
     if (err == 1)
     {
         PyErr_SetString(PyExc_OSError, "Error on loading audio data");
+        return NULL;
     }
     else if (err == -1)
     {
         PyErr_SetString(PyExc_IOError, "Invalid file type");
+        return NULL;
     }
 
     return (PyObject *)result;
