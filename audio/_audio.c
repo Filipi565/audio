@@ -30,4 +30,6 @@ PyMODINIT_FUNC PyInit__audio()
         Py_DECREF(m);
         return NULL;
     }
+
+    return m;
 }
