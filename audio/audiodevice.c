@@ -167,6 +167,7 @@ static PyObject *AudioDevice_close(PyObject *self, PyObject *args)
         free(AUDIO.System.pcmBuffer);
         AUDIO.System.pcmBuffer = NULL;
         AUDIO.System.pcmBufferSize = 0;
+        Py_DECREF(AUDIO.device_id);
     }
 
     Py_RETURN_NONE;
