@@ -225,5 +225,6 @@ PyTypeObject AudioDevice_Type = {
     .tp_name = "_audio._AudioDeviceHelper",
     .tp_new = PyType_GenericNew,
     .tp_basicsize = sizeof(PyObject),
-    .tp_methods = methods
+    .tp_methods = methods,
+    .tp_flags = Py_TPFLAGS_DEFAULT | Py_TPFLAGS_BASETYPE
 };
