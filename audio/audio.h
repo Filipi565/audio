@@ -13,6 +13,7 @@ extern PyTypeObject AudioDevice_Type;
 extern PyTypeObject DeviceInfo_Type;
 extern PyTypeObject DeviceId_Type;
 extern PyObject *MiniAudioError;
+extern PyTypeObject Wave_Type;
 
 #ifdef __cplusplus
 }
