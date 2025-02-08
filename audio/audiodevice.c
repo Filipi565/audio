@@ -68,6 +68,9 @@ static AudioData AUDIO;
 
 #include "OnSendAudioDataToDevice.h"
 
+static bool isContextInitialized = false;
+static ma_context_config context_config;
+
 static PyObject *AudioDevice_init(PyObject *self, PyObject *args)
 {
     ma_device_id *device_id;
@@ -93,13 +96,16 @@ static PyObject *AudioDevice_init(PyObject *self, PyObject *args)
         device_id = (ma_device_id *)(device_id_obj + 1);
     }
 
-    ma_context_config context = ma_context_config_init();
-    result = ma_context_init(NULL, 0, &context, &AUDIO.System.context);
-    
-    if (result != MA_SUCCESS)
+    if (!isContextInitialized)
     {
-        PyErr_SetString(MiniAudioError, "Failed to initialize MiniAudio context");
-        return NULL;
+        context_config = ma_context_config_init();
+        result = ma_context_init(NULL, 0, &context_config, &AUDIO.System.context);
+        
+        if (result != MA_SUCCESS)
+        {
+            PyErr_SetString(MiniAudioError, "Failed to initialize MiniAudio context");
+            return NULL;
+        }
     }
 
     ma_device_config config = ma_device_config_init(ma_device_type_playback);
@@ -221,6 +227,18 @@ PyObject *GetDevices(PyObject *m, PyObject *args)
     ma_device_info *pUnused;
     ma_uint32 Unused;
 
+    if (!isContextInitialized)
+    {
+        context_config = ma_context_config_init();
+        Device_result = ma_context_init(NULL, 0, &context_config, &AUDIO.System.context);
+        
+        if (Device_result != MA_SUCCESS)
+        {
+            PyErr_SetString(MiniAudioError, "Failed to initialize MiniAudio context");
+            return NULL;
+        }
+    }
+
     Device_result = ma_context_get_devices(&AUDIO.System.context, &pPlaybackInfos, &playbackCount, &pUnused, &Unused);
 
     if (Device_result != MA_SUCCESS)
@@ -239,10 +257,16 @@ PyObject *GetDevices(PyObject *m, PyObject *args)
     for (ma_uint32 iDevice = 0; iDevice < playbackCount; iDevice++)
     {
         PyObject *deviceinfo_obj = PyType_GenericNew(&DeviceInfo_Type, NULL, NULL);
+        if (deviceinfo_obj == NULL)
+        {
+            PyList_SetItem(result, iDevice, Py_None);
+            continue;
+        }
+
         ma_device_info *deviceinfo = (ma_device_info *)(deviceinfo_obj + 1);
         (*deviceinfo) = pPlaybackInfos[iDevice];
 
-        PyList_Append(result, deviceinfo_obj);
+        PyList_SetItem(result, iDevice, deviceinfo_obj);
     }
 
     return result;
