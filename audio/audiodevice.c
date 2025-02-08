@@ -68,7 +68,7 @@ static AudioData AUDIO;
 
 #include "OnSendAudioDataToDevice.h"
 
-static PyObject *AudioDevice_init(AudioData *self, PyObject *args)
+static PyObject *AudioDevice_init(PyObject *self, PyObject *args)
 {
     ma_device_id *device_id;
     PyObject *device_id_obj;
@@ -151,7 +151,7 @@ static PyObject *AudioDevice_init(AudioData *self, PyObject *args)
     Py_RETURN_NONE;
 }
 
-static PyObject *AudioDevice_close(AudioData *self, PyObject *args)
+static PyObject *AudioDevice_close(PyObject *self, PyObject *args)
 {
     if (!AUDIO.System.isReady)
     {
@@ -172,12 +172,12 @@ static PyObject *AudioDevice_close(AudioData *self, PyObject *args)
     Py_RETURN_NONE;
 }
 
-static PyObject *AudioDevice_is_ready(AudioData *self, PyObject *args)
+static PyObject *AudioDevice_is_ready(PyObject *self, PyObject *args)
 {
     return PyBool_FromLong((long)AUDIO.System.isReady);
 }
 
-static PyObject *AudioDevice_master_volume(AudioData *self, PyObject *args)
+static PyObject *AudioDevice_master_volume(PyObject *self, PyObject *args)
 {
     PyObject *arg;
 
