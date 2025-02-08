@@ -10,12 +10,12 @@ struct DeviceInfo
     ma_device_info info;
 };
 
-static PyObject *DeviceInfoMethod_name(DeviceInfo *self, PyObject *args)
+static PyObject *DeviceInfoMethod_name(DeviceInfo *self, void *closure)
 {
     return PyUnicode_FromString(self->info.name);
 }
 
-static PyObject *DeviceInfoMethod_id(DeviceInfo *self, PyObject *args)
+static PyObject *DeviceInfoMethod_id(DeviceInfo *self, void *closure)
 {
     PyObject *result = PyType_GenericNew(&DeviceId_Type, NULL, NULL);
     ma_device_id *id = (ma_device_id *)(result + 1);
@@ -26,16 +26,17 @@ static PyObject *DeviceInfoMethod_id(DeviceInfo *self, PyObject *args)
 
 #define GETMETHOD(name) DeviceInfoMethod_##name
 
-static PyMethodDef methods[] = {
-    METHOD(name, METH_NOARGS),
-    METHOD(id, METH_NOARGS),
-    {NULL, NULL, 0, NULL}
+static PyGetSetDef properties[] = {
+    {"name", GETMETHOD(name), NULL, NULL, NULL},
+    {"id", GETMETHOD(id), NULL, NULL, NULL},
+    {NULL, NULL, NULL, NULL, NULL}
 };
 
 PyTypeObject DeviceInfo_Type = {
     .tp_new = NULL,
     .tp_name = "_audio.DeviceInfo",
     .tp_basicsize = sizeof(DeviceInfo),
-    .tp_methods = methods,
+    .tp_getset = properties,
+    .tp_methods = NULL,
     .tp_flags = 0
 };
