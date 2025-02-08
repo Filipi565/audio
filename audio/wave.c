@@ -30,6 +30,7 @@ static PyObject *Wave_unload(WaveObj *self, PyObject *args)
 #define GETMETHOD(fname) Wave_##fname
 
 static PyMethodDef methods[] = {
+    {"__del__", (PyCFunction)Wave_unload, METH_NOARGS, NULL},
     METHOD(is_valid, METH_NOARGS),
     METHOD(unload, METH_NOARGS),
     {NULL, NULL, 0, NULL}
