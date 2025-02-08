@@ -64,7 +64,7 @@ typedef struct AudioData {
     PyObject *device_id;
 } AudioData;
 
-static AudioData AUDIO;
+extern AudioData AUDIO;
 
 #include "OnSendAudioDataToDevice.h"
 
