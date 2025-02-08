@@ -24,7 +24,7 @@ PyMODINIT_FUNC PyInit__audio()
     }
 
     Py_INCREF(MiniAudioError);
-    if (!PyModule_AddObject(m, "MiniAudioError", MiniAudioError))
+    if (PyModule_AddObject(m, "MiniAudioError", MiniAudioError) != 0)
     {
         Py_DECREF(MiniAudioError);
         Py_DECREF(m);
