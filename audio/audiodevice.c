@@ -47,7 +47,6 @@ struct rAudioBuffer {
 };
 
 typedef struct AudioData {
-    PyObject _;
     struct {
         ma_context context;         // miniaudio context data
         ma_device device;           // miniaudio device
@@ -64,6 +63,8 @@ typedef struct AudioData {
     rAudioProcessor *mixedProcessor;
     PyObject *device_id;
 } AudioData;
+
+static AudioData AUDIO;
 
 #include "OnSendAudioDataToDevice.h"
 
@@ -93,7 +94,7 @@ static PyObject *AudioDevice_init(AudioData *self, PyObject *args)
     }
 
     ma_context_config context = ma_context_config_init();
-    result = ma_context_init(NULL, 0, &context, &self->System.context);
+    result = ma_context_init(NULL, 0, &context, &AUDIO.System.context);
     
     if (result != MA_SUCCESS)
     {
@@ -105,46 +106,46 @@ static PyObject *AudioDevice_init(AudioData *self, PyObject *args)
     config.playback.pDeviceID = device_id;
     config.playback.format = ma_format_f32;
     config.playback.channels = 2;
-    config.capture.pDeviceID = NULL;  // NULL for the default capture self->System.device
+    config.capture.pDeviceID = NULL;  // NULL for the default capture AUDIO.System.device
     config.capture.format = ma_format_s16;
     config.capture.channels = 1;
     config.sampleRate = 0;
     config.dataCallback = OnSendAudioDataToDevice;
     config.pUserData = NULL;
 
-    result = ma_device_init(&self->System.context, &config, &self->System.device);
+    result = ma_device_init(&AUDIO.System.context, &config, &AUDIO.System.device);
     if (result != MA_SUCCESS)
     {
         PyErr_SetString(MiniAudioError, "Failed to initialize MiniAudio playback device");
-        ma_context_uninit(&self->System.context);
+        ma_context_uninit(&AUDIO.System.context);
         return NULL;
     }
 
-    result = ma_mutex_init(&self->System.lock);
+    result = ma_mutex_init(&AUDIO.System.lock);
     if (result != MA_SUCCESS)
     {
         PyErr_SetString(MiniAudioError, "Failed to create MiniAudio mutex for mixing");
-        ma_device_uninit(&self->System.device);
-        ma_context_uninit(&self->System.context);
+        ma_device_uninit(&AUDIO.System.device);
+        ma_context_uninit(&AUDIO.System.context);
         return NULL;
     }
 
-    result = ma_device_start(&self->System.device);
+    result = ma_device_start(&AUDIO.System.device);
     if (result != MA_SUCCESS)
     {
         PyErr_SetString(MiniAudioError, "Failed to start playback device");
-        ma_device_uninit(&self->System.device);
-        ma_context_uninit(&self->System.context);
+        ma_device_uninit(&AUDIO.System.device);
+        ma_context_uninit(&AUDIO.System.context);
         return NULL;
     }
 
-    self->System.isReady = true;
-    self->device_id = NULL;
+    AUDIO.System.isReady = true;
+    AUDIO.device_id = NULL;
     
     if (device_id != NULL)
     {
         Py_INCREF(device_id_obj);
-        self->device_id = device_id_obj;
+        AUDIO.device_id = device_id_obj;
     }
 
     Py_RETURN_NONE;
@@ -152,20 +153,20 @@ static PyObject *AudioDevice_init(AudioData *self, PyObject *args)
 
 static PyObject *AudioDevice_close(AudioData *self, PyObject *args)
 {
-    if (!self->System.isReady)
+    if (!AUDIO.System.isReady)
     {
         PyErr_Warn(PyExc_Warning, "AudioDevice was not initialized");
     }
     else
     {
-        ma_mutex_uninit(&self->System.lock);
-        ma_device_uninit(&self->System.device);
-        ma_context_uninit(&self->System.context);
+        ma_mutex_uninit(&AUDIO.System.lock);
+        ma_device_uninit(&AUDIO.System.device);
+        ma_context_uninit(&AUDIO.System.context);
 
-        self->System.isReady = false;
-        MA_FREE(self->System.pcmBuffer);
-        self->System.pcmBuffer = NULL;
-        self->System.pcmBufferSize = 0;
+        AUDIO.System.isReady = false;
+        MA_FREE(AUDIO.System.pcmBuffer);
+        AUDIO.System.pcmBuffer = NULL;
+        AUDIO.System.pcmBufferSize = 0;
     }
 
     Py_RETURN_NONE;
@@ -173,7 +174,7 @@ static PyObject *AudioDevice_close(AudioData *self, PyObject *args)
 
 static PyObject *AudioDevice_is_ready(AudioData *self, PyObject *args)
 {
-    return PyBool_FromLong((long)self->System.isReady);
+    return PyBool_FromLong((long)AUDIO.System.isReady);
 }
 
 static PyObject *AudioDevice_master_volume(AudioData *self, PyObject *args)
@@ -188,7 +189,7 @@ static PyObject *AudioDevice_master_volume(AudioData *self, PyObject *args)
     if (Py_IsNone(arg))
     {
         float volume;
-        ma_device_get_master_volume(&self->System.device, &volume);
+        ma_device_get_master_volume(&AUDIO.System.device, &volume);
         return PyFloat_FromDouble((double)volume);
     }
 
@@ -206,7 +207,7 @@ static PyObject *AudioDevice_master_volume(AudioData *self, PyObject *args)
         return NULL;
     }
 
-    ma_device_set_master_volume(&self->System.device, (float)volume);
+    ma_device_set_master_volume(&AUDIO.System.device, (float)volume);
 
     Py_RETURN_NONE;
 }
@@ -223,6 +224,6 @@ static PyMethodDef methods[] = {
 PyTypeObject AudioDevice_Type = {
     .tp_name = "_audio._AudioDeviceHelper",
     .tp_new = PyType_GenericNew,
-    .tp_basicsize = sizeof(AudioData),
+    .tp_basicsize = sizeof(PyObject),
     .tp_methods = methods
 };
