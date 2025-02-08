@@ -202,7 +202,7 @@ static PyObject *AudioDevice_master_volume(PyObject *self, PyObject *args)
 
     if (!PyObject_IsInstance(arg, (PyObject *)&PyFloat_Type))
     {
-        PyErr_SetString(PyExc_TypeError, "Expected a float object");
+        PyErr_SetString(PyExc_TypeError, "master_volume must be a int or a float object");
         return NULL;
     }
 
