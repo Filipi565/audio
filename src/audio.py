@@ -8,7 +8,9 @@ from _audio import ( # type: ignore
 MiniAudioError.__module__ = __name__
 
 def get_devices():
-    return _audio._get_devices()
+    return list(
+        filter(lambda obj: obj is not None, _audio._get_devices())
+    )
 
 class _AudioDeviceHelper(_audio._AudioDeviceHelper):
     def init(self, audiodevice = None):
