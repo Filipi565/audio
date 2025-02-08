@@ -18,6 +18,12 @@ static PyObject *DeviceInfoMethod_name(DeviceInfo *self, void *closure)
 static PyObject *DeviceInfoMethod_id(DeviceInfo *self, void *closure)
 {
     PyObject *result = PyType_GenericNew(&DeviceId_Type, NULL, NULL);
+    
+    if (result == NULL)
+    {
+        return NULL;
+    }
+
     ma_device_id *id = (ma_device_id *)(result + 1);
     (*id) = self->info.id;
 
