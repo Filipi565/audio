@@ -1,6 +1,8 @@
 import _audio # type: ignore
-from _audio import MiniAudioError # type: ignore
-from _audio import DeviceId # type: ignore
+from _audio import ( # type: ignore
+    MiniAudioError,
+    DeviceId
+)
 
 MiniAudioError.__module__ = __name__
 
