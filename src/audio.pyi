@@ -1,4 +1,6 @@
 from typing import Union, List, final
+from typing_extensions import Self
+from _typeshed import StrPath
 
 class MiniAudioError(Exception): ...
 
@@ -22,6 +24,16 @@ class DeviceInfo:
 
         :return: An instance of the DeviceId class representing the unique identifier of the audio device.
         """
+
+class Wave:
+    def unload(self) -> None: ...
+    @property
+    def is_valid(self) -> bool: ...
+
+    @classmethod
+    def fromBytes(cls, filetype: str, buffer: bytes) -> Self: ...
+    @classmethod
+    def fromFile(cls, filepath: StrPath) -> Self: ...
 
 class _AudioDeviceHelper:
     def init(self, audiodevice: Union[DeviceId, None] = None) -> None: ...

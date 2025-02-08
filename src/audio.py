@@ -4,6 +4,7 @@ from _audio import ( # type: ignore
     DeviceInfo,
     DeviceId
 )
+import os
 
 MiniAudioError.__module__ = __name__
 
@@ -62,6 +63,29 @@ class _AudioDeviceHelper(_audio._AudioDeviceHelper):
             other = float(other)
         super().master_volume(other)
 
+class Wave(_audio.Wave):
+    def unload(self):
+        super().unload()
+    
+    @property
+    def is_valid(self):
+        return super().is_valid()
+
+    @classmethod
+    def fromBytes(cls, filetype, buffer):
+        return _audio._wave_from_bytes(filetype, cls, buffer)
+
+    @classmethod
+    def fromFile(cls, filepath):
+        path = os.fspath(filepath)
+        if (not isinstance(path, str)):
+            raise TypeError("filepath must be StrPath")
+        
+        filetype = path.split(".")[-1]
+
+        with open(filepath, "rb") as f:
+            return cls.fromBytes(buffer=f.read(), filetype=f".{filetype}")
+
 AudioDevice = _AudioDeviceHelper()
 
 __all__ = [
@@ -70,6 +94,7 @@ __all__ = [
     "AudioDevice",
     "DeviceInfo",
     "DeviceId",
+    "Wave"
 ]
 
 del _AudioDeviceHelper
