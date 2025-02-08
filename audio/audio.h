@@ -10,6 +10,7 @@ extern "C" {
 #endif
 
 extern PyTypeObject DeviceId_Type;
+extern PyObject *MiniAudioError;
 
 #ifdef __cplusplus
 }
