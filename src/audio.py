@@ -1,6 +1,7 @@
 import _audio # type: ignore
 from _audio import ( # type: ignore
     MiniAudioError,
+    DeviceInfo,
     DeviceId
 )
 
@@ -28,6 +29,7 @@ AudioDevice = _AudioDeviceHelper()
 __all__ = [
     "MiniAudioError",
     "AudioDevice",
+    "DeviceInfo",
     "DeviceId"
 ]
 
