@@ -66,7 +66,7 @@ typedef struct AudioData {
 
 extern AudioData AUDIO;
 
-#include "OnSendAudioDataToDevice.h"
+void OnSendAudioDataToDevice(ma_device *pDevice, void *pFramesOut, const void *pFramesInput, ma_uint32 frameCount);
 
 static bool isContextInitialized = false;
 static ma_context_config context_config;

@@ -2473,7 +2473,7 @@ static ma_uint32 ReadAudioBufferFramesInMixingFormat(AudioBuffer *audioBuffer, f
 // Sending audio data to device callback function
 // This function will be called when miniaudio needs more data
 // NOTE: All the mixing takes place here
-static void OnSendAudioDataToDevice(ma_device *pDevice, void *pFramesOut, const void *pFramesInput, ma_uint32 frameCount)
+void OnSendAudioDataToDevice(ma_device *pDevice, void *pFramesOut, const void *pFramesInput, ma_uint32 frameCount)
 {
     (void)pDevice;
 
