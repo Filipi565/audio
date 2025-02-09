@@ -80,6 +80,42 @@ class Wave(_audio.Wave):
         with open(filepath, "rb") as f:
             return cls.fromBytes(buffer=f.read(), filetype=f".{filetype}")
 
+class Sound(_audio.Sound):
+    def unload(self):
+        super().unload()
+
+    def resume(self):
+        super().resume()
+
+    def pause(self):
+        super().pause()
+
+    def play(self):
+        super().play()
+
+    def stop(self):
+        super().stop()
+    
+    @property
+    def is_valid(self):
+        return super().is_valid()
+
+    @property
+    def is_playing(self):
+        return super().is_playing()
+
+    @classmethod
+    def fromWave(cls, wave):
+        return _audio._sound_from_wave(cls, wave)
+    
+    @classmethod
+    def fromFile(cls, filepath):
+        return cls.fromWave(Wave.fromFile(filepath))
+    
+    @classmethod
+    def fromBytes(cls, filetype, buffer):
+        return cls.fromWave(Wave.fromBytes(filetype, buffer))
+
 AudioDevice = _AudioDeviceHelper()
 
 __all__ = [
@@ -88,6 +124,7 @@ __all__ = [
     "AudioDevice",
     "DeviceInfo",
     "DeviceId",
+    "Sound",
     "Wave"
 ]
 
