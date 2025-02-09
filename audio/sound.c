@@ -58,6 +58,7 @@ static PyObject *Sound_stop(SoundObj *self, PyObject *args)
 
 static PyMethodDef methods[] = {
     {"__del__", (PyCFunction)Sound_unload, METH_NOARGS, NULL},
+    METHOD(is_playing, METH_NOARGS),
     METHOD(is_valid, METH_NOARGS),
     METHOD(unload, METH_NOARGS),
     METHOD(resume, METH_NOARGS),
