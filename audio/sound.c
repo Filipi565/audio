@@ -126,6 +126,11 @@ PyObject *SoundFromWave(PyObject *m, PyObject *args)
         return NULL;
     }
 
+    if (!IsAudioDeviceReady())
+    {
+        PyErr_Warn(PyExc_Warning, "AudioDevice should be initialized before loading a Sound object");
+    }
+
     if (!PyObject_IsSubclass(cls_obj, (PyObject *)&Sound_Type))
     {
         PyErr_SetString(PyExc_TypeError, "cls must be a subclass of _audio.Sound");
