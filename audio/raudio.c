@@ -1703,7 +1703,7 @@ Music LoadMusicStreamFromMemory(const char *fileType, const unsigned char *data,
     if (!musicLoaded)
     {
         TRACELOG(LOG_WARNING, "FILEIO: Music data could not be loaded");
-        *err = -1;
+        *err = -2;
     }
     else
     {
