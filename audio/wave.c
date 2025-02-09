@@ -57,7 +57,7 @@ PyObject *WaveFromBytes(PyObject *m, PyObject *args)
     if (!PyObject_IsSubclass(cls_obj, (PyObject *)&Wave_Type))
     {
         PyErr_SetString(PyExc_TypeError, "cls must be Wave type object");
-        return NULL:
+        return NULL;
     }
 
     if (!PyObject_IsInstance(bytes, (PyObject *)&PyBytes_Type))
