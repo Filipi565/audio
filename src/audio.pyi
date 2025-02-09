@@ -9,6 +9,8 @@ class DeviceId: ...
 
 @final
 class DeviceInfo:
+    def __repr__(self) -> str: ...
+
     @property
     def name(self) -> str:
         """

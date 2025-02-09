@@ -30,6 +30,15 @@ static PyObject *DeviceInfoMethod_id(DeviceInfo *self, void *closure)
     return result;
 }
 
+static PyObject *DeviceInfoMethod_Repr(DeviceInfo *self)
+{
+    char name[13 + sizeof(self->info.name)] = "DeviceInfo(\'";
+    strcat(name, self->info.name);
+    strcat(name, "\')");
+
+    return PyUnicode_FromString(name);
+}
+
 #define GETMETHOD(name) DeviceInfoMethod_##name
 
 static PyGetSetDef properties[] = {
@@ -44,5 +53,6 @@ PyTypeObject DeviceInfo_Type = {
     .tp_basicsize = sizeof(DeviceInfo),
     .tp_getset = properties,
     .tp_methods = NULL,
-    .tp_flags = 0
+    .tp_flags = 0,
+    .tp_repr = (reprfunc)GETMETHOD(Repr)
 };
