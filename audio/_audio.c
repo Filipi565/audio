@@ -1,10 +1,12 @@
 #include "audio.h"
 
+PyObject *SoundFromWave(PyObject *, PyObject *);
 PyObject *WaveFromBytes(PyObject *, PyObject *);
 PyObject *GetDevices(PyObject *, PyObject *);
 
 static PyMethodDef methods[] = {
     {"_wave_from_bytes", WaveFromBytes, METH_VARARGS, NULL},
+    {"_sound_from_wave", SoundFromWave, METH_VARARGS, NULL},
     {"_get_devices", GetDevices, METH_NOARGS, NULL},
     {NULL, NULL, 0, NULL}
 };
@@ -25,8 +27,8 @@ PyMODINIT_FUNC PyInit__audio()
         return NULL;
     }
 
-    PyTypeObject *obj[] = {&AudioDevice_Type, &DeviceId_Type, &DeviceInfo_Type, &Wave_Type};
-    const char *names[] = {"_AudioDeviceHelper", "DeviceId", "DeviceInfo", "Wave"};
+    PyTypeObject *obj[] = {&AudioDevice_Type, &DeviceId_Type, &DeviceInfo_Type, &Wave_Type, &Sound_Type};
+    const char *names[] = {"_AudioDeviceHelper", "DeviceId", "DeviceInfo", "Wave", "Sound"};
     size_t s = sizeof(obj)/sizeof(void *);
 
     for (int i = 0; i < s; i++)
