@@ -73,6 +73,10 @@ class Wave(_audio.Wave):
 
     @classmethod
     def fromBytes(cls, filetype, buffer):
+        if (hasattr(buffer, "__bytes__")):
+            buffer = type(buffer).__bytes__(buffer)
+        elif (isinstance(buffer, bytearray)):
+            buffer = bytes(buffer)
         return _audio._wave_from_bytes(filetype, cls, buffer)
 
     @classmethod
