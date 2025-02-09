@@ -1499,8 +1499,9 @@ Music LoadMusicStream(const char *fileName)
 
 // Load music stream from memory buffer, fileType refers to extension: i.e. ".wav"
 // WARNING: File extension must be provided in lower-case
-Music LoadMusicStreamFromMemory(const char *fileType, const unsigned char *data, int dataSize)
+Music LoadMusicStreamFromMemory(const char *fileType, const unsigned char *data, int dataSize, int *err)
 {
+    *err = 0;
     Music music = { 0 };
     bool musicLoaded = false;
 
@@ -1527,6 +1528,7 @@ Music LoadMusicStreamFromMemory(const char *fileType, const unsigned char *data,
         else {
             drwav_uninit(ctxWav);
             RL_FREE(ctxWav);
+            *err = 1;
         }
     }
 #endif
@@ -1553,6 +1555,7 @@ Music LoadMusicStreamFromMemory(const char *fileType, const unsigned char *data,
         else
         {
             stb_vorbis_close(ctxOgg);
+            *err = 1;
         }
     }
 #endif
@@ -1575,6 +1578,7 @@ Music LoadMusicStreamFromMemory(const char *fileType, const unsigned char *data,
         {
             drmp3_uninit(ctxMp3);
             RL_FREE(ctxMp3);
+            *err = 1;
         }
     }
 #endif
@@ -1598,7 +1602,7 @@ Music LoadMusicStreamFromMemory(const char *fileType, const unsigned char *data,
             music.looping = true;   // Looping enabled by default
             musicLoaded = true;
         }
-        else{} //No uninit required
+        else{*err = 1;} //No uninit required
     }
 #endif
 #if defined(SUPPORT_FILEFORMAT_FLAC)
@@ -1620,6 +1624,7 @@ Music LoadMusicStreamFromMemory(const char *fileType, const unsigned char *data,
         else
         {
             drflac_free(ctxFlac, NULL);
+            *err = 1;
         }
     }
 #endif
@@ -1649,6 +1654,7 @@ Music LoadMusicStreamFromMemory(const char *fileType, const unsigned char *data,
         else
         {
             jar_xm_free_context(ctxXm);
+            *err = 1;
         }
     }
 #endif
@@ -1688,14 +1694,16 @@ Music LoadMusicStreamFromMemory(const char *fileType, const unsigned char *data,
         {
             jar_mod_unload(ctxMod);
             RL_FREE(ctxMod);
+            *err = 1;
         }
     }
 #endif
-    else TRACELOG(LOG_WARNING, "STREAM: Data format not supported");
+    else *err = -1;
 
     if (!musicLoaded)
     {
         TRACELOG(LOG_WARNING, "FILEIO: Music data could not be loaded");
+        *err = -1;
     }
     else
     {
