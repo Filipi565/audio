@@ -3,6 +3,7 @@
 
 #include <Python.h>
 
+#define PyObject_IsInstance(l, r) PyObject_IsInstance((PyObject *)(l), (PyObject *)(r))
 #define METHOD(name, flags) {#name, (PyCFunction)GETMETHOD(name), flags, NULL}
 
 #ifdef __cplusplus

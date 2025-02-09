@@ -53,16 +53,6 @@ class _AudioDeviceHelper(_audio._AudioDeviceHelper):
         """
         super().close()
 
-    @property
-    def master_volume(self):
-        return super().master_volume(None)
-    
-    @master_volume.setter
-    def master_volume(self, other):
-        if (isinstance(other, int) and not type(other) is bool):
-            other = float(other)
-        super().master_volume(other)
-
 class Wave(_audio.Wave):
     def unload(self):
         super().unload()

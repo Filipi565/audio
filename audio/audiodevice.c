@@ -86,7 +86,7 @@ static PyObject *AudioDevice_init(PyObject *self, PyObject *args)
     {
         device_id = NULL;
     }
-    else if (!PyObject_IsInstance(device_id_obj, (PyObject *)&DeviceId_Type))
+    else if (!PyObject_IsInstance(device_id_obj, &DeviceId_Type))
     {
         PyErr_SetString(PyExc_TypeError, "\'audiodevice\' must be a _audio.DeviceId or NoneType object");
         return NULL;
@@ -184,39 +184,32 @@ static PyObject *AudioDevice_is_ready(PyObject *self, PyObject *args)
     return PyBool_FromLong((long)AUDIO.System.isReady);
 }
 
-static PyObject *AudioDevice_master_volume(PyObject *self, PyObject *args)
+static PyObject *AudioDevice_GetMasterVolume(PyObject *self, void *closure)
 {
-    PyObject *arg;
+    float volume;
+    ma_device_get_master_volume(&AUDIO.System.device, &volume);
+    return PyFloat_FromDouble((double)volume);
+}
 
-    if (!PyArg_ParseTuple(args, "O", &arg))
+static int AudioDevice_SetMasterVolume(PyObject *self, PyObject *value, void *closure)
+{
+    float volume;
+
+    if (PyObject_IsInstance(value, &PyLong_Type) && !PyObject_IsInstance(value, &PyBool_Type))
     {
-        return NULL;
+        volume = (float)PyLong_AsDouble(value);
+    }
+    else if (PyObject_IsInstance(value, &PyFloat_Type))
+    {
+        volume = (float)PyFloat_AsDouble(value);
+    }
+    else
+    {
+        PyErr_SetString(PyExc_TypeError, "master_volume must be float or int object");
+        return -1;
     }
 
-    if (Py_IsNone(arg))
-    {
-        float volume;
-        ma_device_get_master_volume(&AUDIO.System.device, &volume);
-        return PyFloat_FromDouble((double)volume);
-    }
-
-    if (!PyObject_IsInstance(arg, (PyObject *)&PyFloat_Type))
-    {
-        PyErr_SetString(PyExc_TypeError, "master_volume must be a int or a float object");
-        return NULL;
-    }
-
-    double volume = PyFloat_AsDouble(arg);
-
-    if (volume < 0)
-    {
-        PyErr_SetString(PyExc_ValueError, "master_volume must be positive");
-        return NULL;
-    }
-
-    ma_device_set_master_volume(&AUDIO.System.device, (float)volume);
-
-    Py_RETURN_NONE;
+    return 0;
 }
 
 PyObject *GetDevices(PyObject *m, PyObject *args)
@@ -275,10 +268,14 @@ PyObject *GetDevices(PyObject *m, PyObject *args)
 #define GETMETHOD(name) AudioDevice_##name
 
 static PyMethodDef methods[] = {
-    METHOD(master_volume, METH_VARARGS),
     METHOD(init, METH_VARARGS),
     METHOD(close, METH_NOARGS),
     {NULL, NULL, 0, NULL}
+};
+
+static PyGetSetDef properties[] = {
+    {"master_volume", GETMETHOD(GetMasterVolume), GETMETHOD(SetMasterVolume), NULL, NULL},
+    {NULL, NULL, NULL, NULL, NULL}
 };
 
 PyTypeObject AudioDevice_Type = {
@@ -286,5 +283,6 @@ PyTypeObject AudioDevice_Type = {
     .tp_new = PyType_GenericNew,
     .tp_basicsize = sizeof(PyObject),
     .tp_methods = methods,
+    .tp_getset = properties,
     .tp_flags = Py_TPFLAGS_DEFAULT | Py_TPFLAGS_BASETYPE
 };

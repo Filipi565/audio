@@ -60,7 +60,7 @@ PyObject *WaveFromBytes(PyObject *m, PyObject *args)
         return NULL;
     }
 
-    if (!PyObject_IsInstance(bytes, (PyObject *)&PyBytes_Type))
+    if (!PyObject_IsInstance(bytes, &PyBytes_Type))
     {
         PyErr_SetString(PyExc_TypeError, "Expected bytes object");
     }
