@@ -209,6 +209,14 @@ static int AudioDevice_SetMasterVolume(PyObject *self, PyObject *value, void *cl
         return -1;
     }
 
+    if (volume < 0)
+    {
+        PyErr_SetString(PyExc_ValueError, "master_volume must be positive");
+        return -1;
+    }
+
+    ma_device_set_master_volume(&AUDIO.System.device, volume);
+
     return 0;
 }
 
