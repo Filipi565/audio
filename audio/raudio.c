@@ -1698,7 +1698,7 @@ Music LoadMusicStreamFromMemory(const char *fileType, const unsigned char *data,
         }
     }
 #endif
-    else *err = -1;
+    else *err = -3;
 
     if (!musicLoaded)
     {
