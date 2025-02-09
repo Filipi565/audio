@@ -57,9 +57,7 @@ class Wave(_audio.Wave):
     def unload(self):
         super().unload()
     
-    @property
-    def is_valid(self):
-        return super().is_valid()
+    is_valid = property(_audio.Wave.is_valid)
 
     @classmethod
     def fromBytes(cls, filetype, buffer):
@@ -96,13 +94,8 @@ class Sound(_audio.Sound):
     def stop(self):
         super().stop()
     
-    @property
-    def is_valid(self):
-        return super().is_valid()
-
-    @property
-    def is_playing(self):
-        return super().is_playing()
+    is_playing = property(_audio.Sound.is_playing)
+    is_valid = property(_audio.Sound.is_valid)
 
     @classmethod
     def fromWave(cls, wave):
