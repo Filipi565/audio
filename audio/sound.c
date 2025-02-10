@@ -147,6 +147,11 @@ PyObject *SoundFromWave(PyObject *m, PyObject *args)
 
     Wave *wave = (Wave *)(obj + 1);
     SoundObj *result = (SoundObj *)PyType_GenericNew(cls, NULL, NULL);
+    
+    if (result == NULL)
+    {
+        return NULL;
+    }
 
     result->sound = LoadSoundFromWave(*wave);
 
