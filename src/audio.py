@@ -79,6 +79,26 @@ class Wave(_audio.Wave):
             return cls.fromBytes(buffer=f.read(), filetype=f".{filetype}")
 
 class Sound(_audio.Sound):
+    def __new__(cls, fp, filetype = None):
+        openfp = True
+
+        if isinstance(fp, str) or hasattr(fp, "__fspath__"):
+            openfp = False
+            fp = os.fspath(fp)
+        
+        if filetype is None and openfp:
+            filetype = fp.split(".")[-1]
+        
+        if openfp:
+            with open(fp, "rb") as f:
+                buffer = f.read()
+        elif hasattr(fp, "read"):
+            buffer = fp.read()
+        else:
+            buffer = fp
+        
+        return cls.fromBytes(filetype, buffer)
+
     def unload(self):
         super().unload()
 

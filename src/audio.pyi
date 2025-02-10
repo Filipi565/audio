@@ -1,5 +1,5 @@
 from typing_extensions import Self, SupportsBytes
-from typing import Union, List, final
+from typing import Union, List, final, overload
 from _typeshed import StrPath
 
 _BufferType = Union[bytes, bytearray, SupportsBytes]
@@ -42,6 +42,10 @@ class Wave:
     def fromFile(cls, filepath: StrPath) -> Self: ...
 
 class Sound:
+    @overload
+    def __new__(cls, fp: StrPath, filetype: Union[str, None] = None) -> Self: ...
+    @overload
+    def __new__(cls, fp: _BufferType, filetype: str) -> Self: ...
     def __del__(self) -> None: ...
 
     def unload(self) -> None: ...
