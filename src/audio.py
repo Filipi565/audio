@@ -87,7 +87,7 @@ class Sound(_audio.Sound):
             fp = os.fspath(fp)
         
         if filetype is None and openfp:
-            filetype = fp.split(".")[-1]
+            filetype = "." + fp.split(".")[-1]
         
         if openfp:
             with open(fp, "rb") as f:
