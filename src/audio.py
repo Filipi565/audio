@@ -80,10 +80,10 @@ class Wave(_audio.Wave):
 
 class Sound(_audio.Sound):
     def __new__(cls, fp, filetype = None):
-        openfp = True
+        openfp = False
 
         if isinstance(fp, str) or hasattr(fp, "__fspath__"):
-            openfp = False
+            openfp = True
             fp = os.fspath(fp)
         
         if filetype is None and openfp:
