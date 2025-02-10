@@ -79,6 +79,6 @@ class _AudioDeviceHelper:
     @master_volume.setter
     def master_volume(self, other) -> None: ...
 
-AudioDevice: _AudioDeviceHelper
+device: _AudioDeviceHelper
 
 def get_devices() -> List[DeviceInfo]: ...

@@ -132,7 +132,7 @@ class Sound(_audio.Sound):
     def fromBytes(cls, filetype, buffer):
         return cls.fromWave(Wave.fromBytes(filetype, buffer))
 
-AudioDevice = _AudioDeviceHelper()
+device = _AudioDeviceHelper()
 
 __all__ = [
     "MiniAudioError",
