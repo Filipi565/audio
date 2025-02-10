@@ -96,6 +96,9 @@ class Sound(_audio.Sound):
             buffer = fp.read()
         else:
             buffer = fp
+
+        if filetype is None:
+            raise TypeError("filetype is required when loading a sound from bytes")
         
         return cls.fromBytes(filetype, buffer)
 
