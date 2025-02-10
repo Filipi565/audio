@@ -1,6 +1,6 @@
 from typing import Union, List, final, overload, IO
 from typing_extensions import Self, SupportsBytes
-from _typeshed import StrPath
+from _typeshed import StrPath, SupportsRead
 
 _BufferType = Union[bytes, bytearray, SupportsBytes]
 
@@ -45,7 +45,7 @@ class Sound:
     @overload
     def __new__(cls, fp: StrPath, filetype: Union[str, None] = None) -> Self: ...
     @overload
-    def __new__(cls, fp: Union[_BufferType, IO[bytes]], filetype: str) -> Self: ...
+    def __new__(cls, fp: Union[_BufferType, SupportsRead[bytes]], filetype: str) -> Self: ...
     def __del__(self) -> None: ...
 
     def unload(self) -> None: ...
