@@ -83,6 +83,11 @@ PyObject *WaveFromBytes(PyObject *m, PyObject *args)
     int err;
     result->wave = LoadWaveFromMemory(filetype, buffer, (int)length, &err);
 
+    if (err != 0)
+    {
+        Py_DECREF(result);
+    }
+
     if (err == 1)
     {
         PyErr_SetString(PyExc_OSError, "Error on loading audio data");
