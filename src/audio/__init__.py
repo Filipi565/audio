@@ -140,9 +140,9 @@ device = _AudioDeviceHelper()
 __all__ = [
     "MiniAudioError",
     "get_devices",
-    "AudioDevice",
     "DeviceInfo",
     "DeviceId",
+    "device",
     "Sound",
     "Wave"
 ]
