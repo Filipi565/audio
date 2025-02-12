@@ -84,3 +84,13 @@ class _AudioDeviceHelper:
 device: _AudioDeviceHelper
 
 def get_devices() -> List[DeviceInfo]: ...
+
+__all__ = [
+    "MiniAudioError",
+    "get_devices",
+    "DeviceInfo",
+    "DeviceId",
+    "device",
+    "Sound",
+    "Wave"
+]
