@@ -1,5 +1,5 @@
-from typing import Union, List, final, overload, IO
 from typing_extensions import Self, SupportsBytes
+from typing import Union, List, final, overload
 from _typeshed import StrPath, SupportsRead
 
 _BufferType = Union[bytes, bytearray, SupportsBytes]
