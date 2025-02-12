@@ -55,10 +55,7 @@ class _AudioDeviceHelper(_audio._AudioDeviceHelper):
         """
         super().close()
 
-class Wave(_audio.Wave):
-    def unload(self):
-        super().unload()
-    
+class Wave(_audio.Wave):    
     is_valid = property(_audio.Wave.is_valid)
 
     @classmethod
@@ -106,21 +103,6 @@ class Sound(_audio.Sound):
             raise TypeError("filetype is required when loading a sound from bytes")
         
         return cls.fromBytes(filetype, buffer)
-
-    def unload(self):
-        super().unload()
-
-    def resume(self):
-        super().resume()
-
-    def pause(self):
-        super().pause()
-
-    def play(self):
-        super().play()
-
-    def stop(self):
-        super().stop()
     
     is_playing = property(_audio.Sound.is_playing)
     is_valid = property(_audio.Sound.is_valid)
