@@ -6,6 +6,8 @@ from _audio import ( # type: ignore
 )
 import os
 
+__version__ = "1.0.1"
+
 MiniAudioError.__module__ = __name__
 
 def get_devices():

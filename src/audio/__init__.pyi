@@ -2,6 +2,8 @@ from typing_extensions import Self, SupportsBytes
 from typing import Union, List, final, overload
 from _typeshed import StrPath, SupportsRead
 
+__version__: str
+
 _BufferType = Union[bytes, bytearray, SupportsBytes]
 
 class MiniAudioError(Exception): ...
