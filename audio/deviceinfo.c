@@ -32,9 +32,8 @@ static PyObject *DeviceInfoMethod_id(DeviceInfo *self, void *closure)
 
 static PyObject *DeviceInfoMethod_Repr(DeviceInfo *self)
 {
-    char name[13 + sizeof(self->info.name)] = "DeviceInfo(\'";
-    strcat(name, self->info.name);
-    strcat(name, "\')");
+    char name[13 + sizeof(self->info.name)];
+    snprintf(name, sizeof(name)/sizeof(char), "DeviceInfo(\'%s\')", self->info.name);
 
     return PyUnicode_FromString(name);
 }
