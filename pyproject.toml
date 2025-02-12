@@ -1,0 +1,18 @@
+[project]
+name = "audio"
+version = "1.0.0"
+authors = [
+    {name="Filipi565"},
+]
+
+description = "A simple python module to play audio"
+requires-python = ">=3.8"
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
+]
+
+[project.urls]
+Source = "https://github.com/Filipi565/audio"
+Issues = "https://github.com/Filipi565/audio/issues"
