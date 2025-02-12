@@ -41,8 +41,8 @@ static PyObject *DeviceInfoMethod_Repr(DeviceInfo *self)
 #define GETMETHOD(name) DeviceInfoMethod_##name
 
 static PyGetSetDef properties[] = {
-    {"name", GETMETHOD(name), NULL, NULL, NULL},
-    {"id", GETMETHOD(id), NULL, NULL, NULL},
+    {"name", (getter)GETMETHOD(name), NULL, NULL, NULL},
+    {"id", (getter)GETMETHOD(id), NULL, NULL, NULL},
     {NULL, NULL, NULL, NULL, NULL}
 };
 
