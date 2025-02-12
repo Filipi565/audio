@@ -6,6 +6,7 @@ authors = [
 ]
 
 description = "A simple python module to play audio"
+readme = "README.md"
 requires-python = ">=3.8"
 classifiers = [
     "Programming Language :: Python :: 3",
