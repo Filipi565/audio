@@ -125,7 +125,7 @@ static PyObject *AudioDevice_init(PyObject *self, PyObject *args)
         PyErr_SetString(MiniAudioError, "Failed to initialize MiniAudio playback device");
         ma_context_uninit(&AUDIO.System.context);
         return NULL;
-    }
+    }    
 
     result = ma_mutex_init(&AUDIO.System.lock);
     if (result != MA_SUCCESS)
@@ -134,7 +134,7 @@ static PyObject *AudioDevice_init(PyObject *self, PyObject *args)
         ma_device_uninit(&AUDIO.System.device);
         ma_context_uninit(&AUDIO.System.context);
         return NULL;
-    }
+    }    
 
     result = ma_device_start(&AUDIO.System.device);
     if (result != MA_SUCCESS)
@@ -143,7 +143,7 @@ static PyObject *AudioDevice_init(PyObject *self, PyObject *args)
         ma_device_uninit(&AUDIO.System.device);
         ma_context_uninit(&AUDIO.System.context);
         return NULL;
-    }
+    }    
 
     AUDIO.System.isReady = true;
     AUDIO.device_id = NULL;
@@ -152,10 +152,12 @@ static PyObject *AudioDevice_init(PyObject *self, PyObject *args)
     {
         Py_INCREF(device_id_obj);
         AUDIO.device_id = device_id_obj;
-    }
+    }    
 
     Py_RETURN_NONE;
-}
+}    
+
+static PyObject *devices = NULL;
 
 static PyObject *AudioDevice_close(PyObject *self, PyObject *args)
 {
@@ -177,6 +179,11 @@ static PyObject *AudioDevice_close(PyObject *self, PyObject *args)
         {
             Py_DECREF(AUDIO.device_id);
         }
+    }
+
+    if (devices != NULL)
+    {
+        Py_DECREF(devices);
     }
 
     Py_RETURN_NONE;
@@ -231,6 +238,12 @@ PyObject *GetDevices(PyObject *m, PyObject *args)
     ma_device_info *pUnused;
     ma_uint32 Unused;
 
+    if (devices != NULL)
+    {
+        Py_INCREF(devices);
+        return devices;
+    }
+
     if (!isContextInitialized)
     {
         context_config = ma_context_config_init();
@@ -251,9 +264,9 @@ PyObject *GetDevices(PyObject *m, PyObject *args)
         return NULL;
     }
 
-    PyObject *result = PyList_New(playbackCount);
+    devices = PyList_New(playbackCount);
 
-    if (result == NULL)
+    if (devices == NULL)
     {
         return NULL;
     }
@@ -263,17 +276,19 @@ PyObject *GetDevices(PyObject *m, PyObject *args)
         PyObject *deviceinfo_obj = PyType_GenericNew(&DeviceInfo_Type, NULL, NULL);
         if (deviceinfo_obj == NULL)
         {
-            PyList_SetItem(result, iDevice, Py_None);
+            PyList_SetItem(devices, iDevice, Py_None);
             continue;
         }
 
         ma_device_info *deviceinfo = (ma_device_info *)(deviceinfo_obj + 1);
         (*deviceinfo) = pPlaybackInfos[iDevice];
 
-        PyList_SetItem(result, iDevice, deviceinfo_obj);
+        PyList_SetItem(devices, iDevice, deviceinfo_obj);
     }
 
-    return result;
+    Py_INCREF(devices);
+
+    return devices;
 }
 
 #define GETMETHOD(name) AudioDevice_##name
