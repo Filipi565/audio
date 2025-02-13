@@ -90,7 +90,7 @@ PyObject *WaveFromBytes(PyObject *m, PyObject *args)
 
     if (err == 1)
     {
-        PyErr_SetString(PyExc_OSError, "Error on loading audio data");
+        PyErr_SetString(PyExc_MemoryError, "Error on loading audio data");
         return NULL;
     }
     else if (err == -1)
