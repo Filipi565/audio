@@ -294,6 +294,7 @@ PyObject *GetDevices(PyObject *m, PyObject *args)
 #define GETMETHOD(name) AudioDevice_##name
 
 static PyMethodDef methods[] = {
+    METHOD(is_ready, METH_NOARGS),
     METHOD(init, METH_VARARGS),
     METHOD(close, METH_NOARGS),
     {NULL, NULL, 0, NULL}

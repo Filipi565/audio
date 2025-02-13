@@ -28,6 +28,8 @@ def get_devices():
     )
 
 class _AudioDeviceHelper(_audio._AudioDeviceHelper):
+    is_ready = property(_audio._AudioDeviceHelper.is_ready)
+    
     def init(self, audiodevice = None):
         """
         Initialize the audio device helper with the given audio device.
