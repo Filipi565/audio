@@ -6,7 +6,7 @@ from _audio import ( # type: ignore
 )
 import os
 
-__version__ = "1.0.1"
+__version__ = "1.1.0"
 
 MiniAudioError.__module__ = __name__
 
@@ -29,7 +29,7 @@ def get_devices():
 
 class _AudioDeviceHelper(_audio._AudioDeviceHelper):
     is_ready = property(_audio._AudioDeviceHelper.is_ready)
-    
+
     def init(self, audiodevice = None):
         """
         Initialize the audio device helper with the given audio device.
