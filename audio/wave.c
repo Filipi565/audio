@@ -71,6 +71,7 @@ PyObject *WaveFromBytes(PyObject *m, PyObject *args)
     if (!PyObject_IsInstance(bytes, &PyBytes_Type))
     {
         PyErr_SetString(PyExc_TypeError, "Expected bytes object");
+        return NULL;
     }
 
     PyTypeObject *cls = (PyTypeObject *)cls_obj;
