@@ -1,5 +1,5 @@
+from typing import Union, List, final, overload, Iterator
 from typing_extensions import Self, SupportsBytes
-from typing import Union, List, final, overload
 from _typeshed import StrPath, SupportsRead
 
 __version__: str
@@ -30,6 +30,13 @@ class DeviceInfo:
 
         :return: An instance of the DeviceId class representing the unique identifier of the audio device.
         """
+
+@final
+class DeviceInfoIterator(Iterator[DeviceInfo]):
+    def __getitem__(self, index: int, /) -> DeviceInfo: ...
+    def __next__(self) -> DeviceInfo: ...
+    def __iter__(self) -> Self: ...
+    def __len__(self) -> int: ...
 
 class Wave:
     def __del__(self) -> None: ...
@@ -86,7 +93,7 @@ class _AudioDeviceHelper:
 
 device: _AudioDeviceHelper
 
-def get_devices() -> List[DeviceInfo]: ...
+def get_devices() -> DeviceInfoIterator: ...
 
 __all__ = [
     "MiniAudioError",

@@ -1,5 +1,6 @@
 import _audio # type: ignore
 from _audio import ( # type: ignore
+    DeviceInfoIterator,
     MiniAudioError,
     DeviceInfo,
     DeviceId
@@ -9,6 +10,13 @@ import os
 __version__ = "1.1.0"
 
 MiniAudioError.__module__ = __name__
+
+def _register_deviceinfoiterator():
+    from collections.abc import Iterator
+    Iterator.register(DeviceInfoIterator)
+
+_register_deviceinfoiterator()
+del _register_deviceinfoiterator
 
 def get_devices():
     """
@@ -121,6 +129,7 @@ class Sound(_audio.Sound):
 device = _AudioDeviceHelper()
 
 __all__ = [
+    "DeviceInfoIterator",
     "MiniAudioError",
     "get_devices",
     "DeviceInfo",
