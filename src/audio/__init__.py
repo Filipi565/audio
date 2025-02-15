@@ -12,20 +12,17 @@ MiniAudioError.__module__ = __name__
 
 def get_devices():
     """
-    Retrieve a list of available audio devices.
+    Retrieve a list of available audio devices as a DeviceInfoIterator object.
 
-    This function uses the internal `_get_devices` function from the `_audio` module to fetch the list of audio devices.
-    It filters out any None values from the returned list and returns the filtered list.
+    This function returns the result of _audio._get_devices.
 
     Parameters:
     None
 
     Returns:
-    list: A list of `DeviceInfo` objects representing the available audio devices.
+    DeviceInfoIterator: A list-like of `DeviceInfo` objects representing the available audio devices.
     """
-    return list(
-        filter(lambda obj: obj is not None, _audio._get_devices())
-    )
+    return _audio._get_devices()
 
 class _AudioDeviceHelper(_audio._AudioDeviceHelper):
     is_ready = property(_audio._AudioDeviceHelper.is_ready)
