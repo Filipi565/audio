@@ -57,7 +57,6 @@ static PyObject *Sound_stop(SoundObj *self, PyObject *args)
 }
 
 static PyMethodDef methods[] = {
-    {"__del__", (PyCFunction)Sound_unload, METH_NOARGS, NULL},
     METHOD(is_playing, METH_NOARGS),
     METHOD(is_valid, METH_NOARGS),
     METHOD(unload, METH_NOARGS),
@@ -102,6 +101,14 @@ static int Sound_setVolume(SoundObj *self, PyObject *value, void *closure)
     return 0;
 }
 
+static void Sound_Free(SoundObj *ptr)
+{
+    if (IsSoundValid(ptr->sound))
+    {
+        UnloadSound(ptr->sound);
+    }
+}
+
 static PyGetSetDef properties[] = {
     {"volume", (getter)Sound_getVolume, (setter)Sound_setVolume, NULL, NULL},
     {NULL, NULL, NULL, NULL, NULL}
@@ -113,7 +120,8 @@ PyTypeObject Sound_Type = {
     .tp_methods = methods,
     .tp_getset = properties,
     .tp_new = NULL,
-    .tp_flags = Py_TPFLAGS_BASETYPE | Py_TPFLAGS_DEFAULT
+    .tp_flags = Py_TPFLAGS_BASETYPE | Py_TPFLAGS_DEFAULT,
+    .tp_dealloc = (destructor)GETMETHOD(Free)
 };
 
 PyObject *SoundFromWave(PyObject *m, PyObject *args)

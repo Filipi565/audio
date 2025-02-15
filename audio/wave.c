@@ -27,10 +27,17 @@ static PyObject *Wave_unload(WaveObj *self, PyObject *args)
     Py_RETURN_NONE;
 }
 
+static void Wave_Free(WaveObj *ptr)
+{
+    if (IsWaveValid(ptr->wave))
+    {
+        UnloadWave(ptr->wave);
+    }
+}
+
 #define GETMETHOD(fname) Wave_##fname
 
 static PyMethodDef methods[] = {
-    {"__del__", (PyCFunction)Wave_unload, METH_NOARGS, NULL},
     METHOD(is_valid, METH_NOARGS),
     METHOD(unload, METH_NOARGS),
     {NULL, NULL, 0, NULL}
@@ -40,7 +47,8 @@ PyTypeObject Wave_Type = {
     .tp_name = "_audio.Wave",
     .tp_basicsize = sizeof(WaveObj),
     .tp_methods = methods,
-    .tp_flags = Py_TPFLAGS_DEFAULT | Py_TPFLAGS_BASETYPE
+    .tp_flags = Py_TPFLAGS_DEFAULT | Py_TPFLAGS_BASETYPE,
+    .tp_dealloc = (destructor)GETMETHOD(Free)
 };
 
 PyObject *WaveFromBytes(PyObject *m, PyObject *args)
