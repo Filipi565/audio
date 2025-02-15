@@ -1,12 +1,11 @@
-from typing import Union, final, overload, Iterator
-from _typeshed import GenericPath, SupportsRead
+from typing import Union, final, overload, Iterator, AnyStr
 from typing_extensions import Self, SupportsBytes
+from _typeshed import GenericPath, SupportsRead
 
 __version__: str
 
 _BufferType = Union[bytes, bytearray, SupportsBytes]
 _StrPath = GenericPath[str]
-_StrOrBytesPath = Union[GenericPath[str], GenericPath[bytes]]
 
 class MiniAudioError(Exception): ...
 
@@ -54,7 +53,7 @@ class Wave:
 
 class Sound:
     @overload
-    def __new__(cls, fp: _StrOrBytesPath, filetype: Union[str, bytes, None] = None) -> Self: ...
+    def __new__(cls, fp: GenericPath[AnyStr], filetype: Union[AnyStr, None] = None) -> Self: ...
     @overload
     def __new__(cls, fp: Union[_BufferType, SupportsRead[bytes]], filetype: str) -> Self: ...
     def __del__(self) -> None: ...
