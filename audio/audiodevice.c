@@ -157,7 +157,7 @@ static PyObject *AudioDevice_init(PyObject *self, PyObject *args)
     Py_RETURN_NONE;
 }    
 
-static PyObject *devices = NULL;
+static DeviceInfoIterator *devices = NULL;
 
 static PyObject *AudioDevice_close(PyObject *self, PyObject *args)
 {
@@ -184,6 +184,7 @@ static PyObject *AudioDevice_close(PyObject *self, PyObject *args)
     if (devices != NULL)
     {
         Py_DECREF(devices);
+        devices = NULL;
     }
 
     Py_RETURN_NONE;
@@ -256,39 +257,32 @@ PyObject *GetDevices(PyObject *m, PyObject *args)
         }
     }
 
-    Device_result = ma_context_get_devices(&AUDIO.System.context, &pPlaybackInfos, &playbackCount, &pUnused, &Unused);
-
-    if (Device_result != MA_SUCCESS)
-    {
-        PyErr_SetString(MiniAudioError, "Error on getting devices");
-        return NULL;
-    }
-
-    devices = PyList_New(playbackCount);
+    devices = (DeviceInfoIterator *)PyType_GenericNew(&DeviceInfoIterator_Type, NULL, NULL);
 
     if (devices == NULL)
     {
         return NULL;
     }
 
-    for (ma_uint32 iDevice = 0; iDevice < playbackCount; iDevice++)
+    Device_result = ma_context_get_devices(
+        &AUDIO.System.context,
+        &devices->pPlaybackInfos,
+        &devices->playbackCount,
+        &devices->pUnused,
+        &devices->Unused
+    );
+
+    if (Device_result != MA_SUCCESS)
     {
-        PyObject *deviceinfo_obj = PyType_GenericNew(&DeviceInfo_Type, NULL, NULL);
-        if (deviceinfo_obj == NULL)
-        {
-            PyList_SetItem(devices, iDevice, Py_None);
-            continue;
-        }
-
-        ma_device_info *deviceinfo = (ma_device_info *)(deviceinfo_obj + 1);
-        (*deviceinfo) = pPlaybackInfos[iDevice];
-
-        PyList_SetItem(devices, iDevice, deviceinfo_obj);
+        PyErr_SetString(MiniAudioError, "Error on getting devices");
+        Py_DECREF(devices);
+        return NULL;
     }
+    devices->current = 0;
 
     Py_INCREF(devices);
 
-    return devices;
+    return (PyObject *)devices;
 }
 
 #define GETMETHOD(name) AudioDevice_##name
