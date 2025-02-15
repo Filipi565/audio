@@ -2,11 +2,15 @@ import audio
 import time
 import os
 
-filename = os.path.relpath(os.path.join(__file__, "..", "audio.wav"))
+class FilenameType:
+    def __fspath__(self):
+        return os.path.relpath(os.path.join(__file__, "..", "audio.wav")).encode()
 
 audio.device.init()
 
-sound = audio.Sound(filename, ".wav")
+filename = FilenameType()
+
+sound = audio.Sound(filename, b".wav")
 sound.play()
 
 print(sound.is_valid)
