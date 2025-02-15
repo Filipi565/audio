@@ -6,7 +6,7 @@ filename = os.path.relpath(os.path.join(__file__, "..", "audio.wav"))
 
 audio.device.init()
 
-sound = audio.Sound(filename, b".wav")
+sound = audio.Sound(filename, ".wav")
 sound.play()
 
 print(sound.is_valid)
