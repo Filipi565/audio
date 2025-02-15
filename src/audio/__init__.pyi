@@ -96,6 +96,7 @@ device: _AudioDeviceHelper
 def get_devices() -> DeviceInfoIterator: ...
 
 __all__ = [
+    "DeviceInfoIterator",
     "MiniAudioError",
     "get_devices",
     "DeviceInfo",
