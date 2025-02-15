@@ -7,7 +7,7 @@ from _audio import ( # type: ignore
 )
 import os
 
-__version__ = "1.1.0"
+__version__ = "1.2.0"
 
 MiniAudioError.__module__ = __name__
 
