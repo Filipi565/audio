@@ -18,6 +18,8 @@ sound.play()
 
 print(sound.is_valid)
 
+sound.volume = float(input("Type the new volume: "))
+
 while sound.is_playing:
     time.sleep(.1)
 
