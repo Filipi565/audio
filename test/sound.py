@@ -10,7 +10,10 @@ audio.device.init()
 
 filename = FilenameType()
 
-sound = audio.Sound(filename, b".wav")
+sound = audio.Sound(filename, ".wav") # uses the ".wav" input as filetype
+del sound
+sound = audio.Sound(filename) # uses ".wav" automaticly
+
 sound.play()
 
 print(sound.is_valid)
