@@ -86,6 +86,7 @@ PyObject *WaveFromBytes(PyObject *m, PyObject *args)
     Py_ssize_t length;
     if (PyBytes_AsStringAndSize(bytes, &buffer, &length) != 0)
     {
+        Py_DECREF(result);
         return NULL;
     }
 
