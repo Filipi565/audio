@@ -155,6 +155,7 @@ class Music(_audio.Music):
 
     time_length = property(_audio.Music.time_length)
     time_played = property(_audio.Music.time_played)
+    is_playing = property(_audio.Music.is_playing)
     is_valid = property(_audio.Music.is_valid)
 
     @classmethod

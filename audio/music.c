@@ -75,11 +75,17 @@ static PyObject *Music_time_played(MusicObj *self, PyObject *args)
     return PyFloat_FromDouble((double)GetMusicTimePlayed(self->music));
 }
 
+static PyObject *Music_is_playing(MusicObj *self, PyObject *args)
+{
+    return PyBool_FromLong((long)IsMusicStreamPlaying(self->music));
+}
+
 #define GETMETHOD(name) Music_##name
 
 static PyMethodDef methods[] = {
     METHOD(time_length, METH_NOARGS),
     METHOD(time_played, METH_NOARGS),
+    METHOD(is_playing, METH_NOARGS),
     METHOD(is_valid, METH_NOARGS),
     METHOD(unload, METH_NOARGS),
     METHOD(update, METH_NOARGS),
