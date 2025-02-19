@@ -55,9 +55,19 @@ static PyObject *DeviceInfoIter_getitem(DeviceInfoIterator *self, Py_ssize_t ind
     return create_device_info(PlaybackInfos(self) + index);
 }
 
+static PyObject *DeviceInfoIter___bool__(DeviceInfoIterator *self, PyObject *args)
+{
+    return PyBool_FromLong((long)self->playbackCount);
+}
+
 static PySequenceMethods sequence = {
     .sq_length = (lenfunc)GETMETHOD(len),
     .sq_item = (ssizeargfunc)GETMETHOD(getitem)
+};
+
+static PyMethodDef methods[] = {
+    METHOD(__bool__, METH_NOARGS),
+    {NULL, NULL, 0, NULL}
 };
 
 PyTypeObject DeviceInfoIterator_Type = {
