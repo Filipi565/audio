@@ -234,10 +234,6 @@ static int AudioDevice_SetMasterVolume(PyObject *self, PyObject *value, void *cl
 PyObject *GetDevices(PyObject *m, PyObject *args)
 {
     ma_result Device_result;
-    ma_device_info *pPlaybackInfos;
-    ma_uint32 playbackCount;
-    ma_device_info *pUnused;
-    ma_uint32 Unused;
 
     if (devices != NULL)
     {
