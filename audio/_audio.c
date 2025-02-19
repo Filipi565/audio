@@ -1,10 +1,12 @@
 #include "audio.h"
 
+PyObject *MusicFromBytes(PyObject *, PyObject *);
 PyObject *SoundFromWave(PyObject *, PyObject *);
 PyObject *WaveFromBytes(PyObject *, PyObject *);
 PyObject *GetDevices(PyObject *, PyObject *);
 
 static PyMethodDef methods[] = {
+    {"_music_from_bytes", MusicFromBytes, METH_VARARGS, NULL},
     {"_wave_from_bytes", WaveFromBytes, METH_VARARGS, NULL},
     {"_sound_from_wave", SoundFromWave, METH_VARARGS, NULL},
     {"_get_devices", GetDevices, METH_NOARGS, NULL},
@@ -33,6 +35,7 @@ PyMODINIT_FUNC PyInit__audio()
         &DeviceInfo_Type,
         &Wave_Type,
         &Sound_Type,
+        &Music_Type,
         &DeviceInfoIterator_Type
     };
 
@@ -42,6 +45,7 @@ PyMODINIT_FUNC PyInit__audio()
         "DeviceInfo",
         "Wave",
         "Sound",
+        "Music",
         "DeviceInfoIterator"
     };
     size_t s = sizeof(obj)/sizeof(void *);

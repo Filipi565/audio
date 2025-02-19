@@ -125,6 +125,56 @@ class Sound(_audio.Sound):
     @classmethod
     def fromBytes(cls, filetype, buffer):
         return cls.fromWave(Wave.fromBytes(filetype, buffer))
+    
+class Music(_audio.Music):
+    def __new__(cls, fp, filetype = None):
+        openfp = False
+
+        if isinstance(fp, str) or hasattr(fp, "__fspath__"):
+            openfp = True
+            fp = os.fspath(fp)
+        
+        if filetype is None and openfp:
+            if (isinstance(fp, str)):
+                filetype = "." + fp.split(".")[-1]
+            else:
+                filetype = (b"." + fp.split(b".")[-1]).decode()
+        
+        if openfp:
+            with open(fp, "rb") as f:
+                buffer = f.read()
+        elif hasattr(fp, "read"):
+            buffer = fp.read()
+        else:
+            buffer = fp
+
+        if filetype is None:
+            raise TypeError("filetype is required when loading a sound from bytes")
+        
+        return cls.fromBytes(filetype, buffer)
+
+    time_length = property(_audio.Music.time_length)
+    time_played = property(_audio.Music.time_played)
+    is_valid = property(_audio.Music.is_valid)
+
+    @classmethod
+    def fromFile(cls, filepath):
+        path = os.fspath(filepath)
+        if (not isinstance(path, str)):
+            raise TypeError("filepath must be StrPath")
+        
+        filetype = path.split(".")[-1]
+
+        with open(filepath, "rb") as f:
+            return cls.fromBytes(buffer=f.read(), filetype=f".{filetype}")
+
+    @classmethod
+    def fromBytes(cls, filetype, buffer):
+        if (hasattr(buffer, "__bytes__")):
+            buffer = type(buffer).__bytes__(buffer)
+        elif (isinstance(buffer, bytearray)):
+            buffer = bytes(buffer)
+        return _audio._music_from_bytes(filetype, cls, buffer)
 
 device = _AudioDeviceHelper()
 
@@ -136,6 +186,7 @@ __all__ = [
     "DeviceId",
     "device",
     "Sound",
+    "Music",
     "Wave"
 ]
 
