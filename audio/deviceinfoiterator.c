@@ -22,6 +22,7 @@ static PyObject *create_device_info(ma_device_info *info)
 
 static PyObject *DeviceInfoIter_iter(DeviceInfoIterator *self)
 {
+    self->current = 0;
     Py_INCREF(self);
     return self;
 }
