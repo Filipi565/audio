@@ -2,5 +2,6 @@ import audio
 
 devices = audio.get_devices()
 
-for device in devices:
-    print(device)
+for _ in range(3):
+    for device in devices:
+        print(device)
