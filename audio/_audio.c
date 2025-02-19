@@ -72,7 +72,7 @@ PyMODINIT_FUNC PyInit__audio()
     for (int i = 0; i < s; i++)
     {
         Py_INCREF(obj[i]);
-        if (PyModule_AddObject(m, names[i], obj[i]) != 0)
+        if (PyModule_AddObject(m, names[i], (PyObject *)(obj[i])) != 0)
         {
             for (int j = 0; j < (i+1); j++)
             {
