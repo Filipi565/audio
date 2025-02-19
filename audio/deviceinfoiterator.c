@@ -75,5 +75,6 @@ PyTypeObject DeviceInfoIterator_Type = {
     .tp_basicsize = sizeof(DeviceInfoIterator),
     .tp_iter = (getiterfunc)GETMETHOD(iter),
     .tp_iternext = (iternextfunc)GETMETHOD(next),
-    .tp_as_sequence = &sequence
+    .tp_as_sequence = &sequence,
+    .tp_methods = methods
 };
