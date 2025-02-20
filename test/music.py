@@ -26,6 +26,6 @@ music.volume = float(input("Type the new volume: "))
 while music.is_playing:
     music.update()
     print("Time played:", music.time_played, end="\r", flush=True)
-    time.sleep(1/60)
+    time.sleep(1/120)
 
 audio.device.close()
