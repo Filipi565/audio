@@ -4,10 +4,11 @@ import time
 import os
 
 def update_music(music): #type: (audio.Music) -> None
-    while music.is_playing:
+    while music.is_playing and music.time_played < 68:
         music.update()
         print("Time played:", music.time_played, end="\r", flush=True)
         time.sleep(1/120)
+    music.stop()
 
 class FilenameType:
     def __fspath__(self):
