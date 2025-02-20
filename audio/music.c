@@ -192,6 +192,8 @@ PyObject *MusicFromBytes(PyObject *m, PyObject *args)
 
     result->data = buffer;
 
+    memmove(buffer, tmp_buffer, (size_t)(length*sizeof(char)));
+
     int err;
     result->music = LoadMusicStreamFromMemory(filetype, buffer, (int)length, &err);
 
