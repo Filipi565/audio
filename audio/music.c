@@ -116,7 +116,32 @@ static int Music_setVolume(MusicObj *self, PyObject *other, void *closure)
     return 0;
 }
 
+static PyObject *Music_getLooping(MusicObj *self, void *closure)
+{
+    return PyBool_FromLong((long)self->music.looping);
+}
+
+static int Music_setLooping(MusicObj *self, PyObject *value, void *closure)
+{
+    if (!PyObject_IsInstance(value, &PyBool_Type))
+    {
+        PyErr_SetString(PyExc_TypeError, "looping must be bool object");
+        return 1;
+    }
+
+    if (Py_IsTrue(value))
+    {
+        self->music.looping = true;
+    }
+    else
+    {
+        self->music.looping = false;
+    }
+    return 0;
+}
+
 static PyGetSetDef properties[] = {
+    {"looping", (getter)GETMETHOD(getLooping), (setter)GETMETHOD(setLooping), NULL, NULL},
     {"volume", (getter)GETMETHOD(getVolume), (setter)GETMETHOD(setVolume), NULL, NULL},
     {NULL, NULL, NULL, NULL, NULL}
 };
