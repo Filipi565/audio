@@ -16,12 +16,16 @@ music = audio.Music(filename) # uses ".wav" automaticly
 
 music.play()
 
-print(music.is_valid)
+print("Time length:", music.time_length)
+print("Is playing:", music.is_playing)
+print("Is valid:", music.is_valid)
+print("Looping:", music.looping)
 
 music.volume = float(input("Type the new volume: "))
 
 while music.is_playing:
     music.update()
+    print("Time played:", music.time_played, end="\r", flush=True)
     time.sleep(1/60)
 
 audio.device.close()
