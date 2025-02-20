@@ -1,4 +1,5 @@
 import audio
+import time
 import os
 
 class FilenameType:
@@ -21,5 +22,6 @@ music.volume = float(input("Type the new volume: "))
 
 while music.is_playing:
     music.update()
+    time.sleep(1/60)
 
 audio.device.close()
