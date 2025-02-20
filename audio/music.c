@@ -243,5 +243,7 @@ PyObject *MusicFromBytes(PyObject *m, PyObject *args)
         return NULL;
     }
 
+    result->music.looping = false;
+
     return (PyObject *)result;
 }
